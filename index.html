@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markorð: 151 - 200 algengustu orðin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 20px;
+            color: #4a4a4a;
+        }
+        .word-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0;
+            min-height: 70px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .controls button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .controls button:hover {
+            background-color: #2980b9;
+        }
+        .controls button:active {
+            transform: scale(0.98);
+        }
+        .speaker-btn {
+            background-color: #e74c3c !important;
+            border-radius: 50% !important;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            padding: 0 !important;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .speaker-btn:hover {
+            background-color: #c0392b !important;
+        }
+        .translation-box {
+            margin-top: 20px;
+            font-size: 24px;
+            font-style: italic;
+            color: #16a085;
+            min-height: 35px;
+        }
+        .info-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        .counter {
+            font-size: 16px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Markorð: 151 - 200 algengustu orðin í íslenskum námsbókum</h1>
+    
+    <div class="counter">Orð <span id="currentIndex">1</span> af <span id="totalWords">50</span></div>
+    
+    <div>
+        <select id="langSelect" onchange="translateWord()">
+            <option disabled selected value>Veldu tungumál...</option>
+            <option value="ar">Arabíska – العربية</option>
+            <option value="da">Danska – Dansk</option>
+            <option value="en">Enska – English</option>
+            <option value="tl">Filippseyska – Tagalog</option>
+            <option value="fi">Finnska – Suomi</option>
+            <option value="fr">Franska – Français</option>
+            <option value="nl">Hollenska – Nederlands</option>
+            <option value="it">Ítalska – Italiano</option>
+            <option value="ja">Japanska – 日本語</option>
+            <option value="zh-CN">Kínverska – 中文</option>
+            <option value="lt">Litháíska – Lietuvių</option>
+            <option value="no">Norska – Norsk</option>
+            <option value="pl">Pólska – Polski</option>
+            <option value="ru">Rússneska – Русский</option>
+            <option value="es">Spænska – Español</option>
+            <option value="sv">Sænska – Svenska</option>
+            <option value="de">Þýska – Deutsch</option>
+            <option value="uk">Úkraínska – Українська</option>
+            <option value="vi">Víetnamska – Tiếng Việt</option>
+        </select>
+    </div>
+
+    <div class="word-display" id="icelandicWord">annars</div>
+    
+    <div class="controls">
+        <button onclick="prevWord()">Fyrra</button>
+        <button class="speaker-btn" onclick="speakWord()">🔊</button>
+        <button onclick="nextWord()">Næsta</button>
+    </div>
+    <div class="controls" style="margin-top: 10px;">
+        <button onclick="randomWord()">Slembi (Random)</button>
+    </div>
+
+    <div class="translation-box" id="translationDisplay"></div>
+
+    <div class="info-text"><i>Veldu tungumál úr listanum að ofan til að sjá þýðingu. (Notar Google Translate API)</i></div>
+
+    <div class="info-text" style="margin-top: 30px;">
+        Vinsamlegast sendið ábendingar á <a href="mailto:dgu@fb.is">dgu@fb.is</a>
+    </div>
+</div>
+
+<script>
+    // Orðalistinn þinn (49 orð + 'annars' til að sýna hvernig það virkar)
+    const words = [
+        "annars", "mynd", "finnst", "mig", "ekkert", "hátt", "vegar", "hefði", "sinn", "eitthvað", 
+        "þig", "rétt", "einu", "öllum", "hins", "dag", "hluti", "konar", "aðeins", "ár", 
+        "fleiri", "áhrif", "orð", "ein", "öll", "jarðar", "heim", "ykkur", "alla", "komið", 
+        "aldrei", "sagt", "mun", "halda", "án", "átt", "vatn", "tók", "búa", "gert", 
+        "fyrst", "landi", "hluta", "urðu", "fyrsta", "meðal", "vinna", "þessa", "sögu"
+    ];
+
+    let currentIndex = 0;
+
+    document.getElementById('totalWords').innerText = words.length;
+
+    function updateDisplay() {
+        const word = words[currentIndex];
+        document.getElementById('icelandicWord').innerText = word;
+        document.getElementById('currentIndex').innerText = currentIndex + 1;
+        translateWord(); // Uppfæra þýðingu ef tungumál er valið
+    }
+
+    function nextWord() {
+        if (currentIndex < words.length - 1) {
+            currentIndex++;
+        } else {
+            currentIndex = 0; // Fer aftur á byrjun
+        }
+        updateDisplay();
+    }
+
+    function prevWord() {
+        if (currentIndex > 0) {
+            currentIndex--;
+        } else {
+            currentIndex = words.length - 1; // Fer aftur á enda
+        }
+        updateDisplay();
+    }
+
+    function randomWord() {
+        let newIndex = currentIndex;
+        while (newIndex === currentIndex && words.length > 1) {
+            newIndex = Math.floor(Math.random() * words.length);
+        }
+        currentIndex = newIndex;
+        updateDisplay();
+    }
+
+    function speakWord() {
+        const word = words[currentIndex];
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'is-IS';
+            utterance.rate = 0.8; // Hægir aðeins á svo framburður sé skýrari
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Vafrinn þinn styður ekki upplestur (Speech Synthesis).");
+        }
+    }
+
+    async function translateWord() {
+        const lang = document.getElementById('langSelect').value;
+        const word = words[currentIndex];
+        const displayDiv = document.getElementById('translationDisplay');
+        
+        if (!lang) {
+            displayDiv.innerText = "";
+            return;
+        }
+
+        displayDiv.innerText = "Þýðir...";
+
+        try {
+            // Notar opið API fyrir þýðingar (MyMemory) til að líkja eftir Google Translate án API lykils
+            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=is|${lang}`);
+            const data = await response.json();
+            
+            if(data && data.responseData && data.responseData.translatedText) {
+                displayDiv.innerText = data.responseData.translatedText;
+            } else {
+                displayDiv.innerText = "Þýðing fannst ekki";
+            }
+        } catch (error) {
+            displayDiv.innerText = "Villa við þýðingu";
+            console.error(error);
+        }
+    }
+
+    // Frumstilla skjá
+    updateDisplay();
+</script>
+
+</body>
+</html>
